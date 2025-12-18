@@ -1,6 +1,6 @@
 extends Node3D
 
-const DEBUG := false
+const DEBUG := true
 
 @export var camera_path: NodePath
 @export var terrain_path: NodePath
@@ -8,6 +8,15 @@ const DEBUG := false
 var selection_marker: MeshInstance3D
 var camera: Camera3D
 var terrain
+
+# Select sculpting or painting
+enum Tool {
+	SCULPT,
+	PAINT,
+}
+
+var current_tool := Tool.SCULPT
+var current_material_id := 0
 
 var brush_radius := 2.0
 const MIN_BRUSH_RADIUS := 1.0
@@ -68,6 +77,13 @@ func _process(_dt):
 	)
 	selection_marker.scale = Vector3.ONE * brush_radius * 1.0
 
+	match current_tool:
+		Tool.SCULPT:
+			_process_sculpting()
+		Tool.PAINT:
+			_process_painting()
+			
+func _process_sculpting():
 	# Sculpting
 	if Input.is_action_pressed("add_density"):
 		if DEBUG:
@@ -87,8 +103,46 @@ func _process(_dt):
 			brush_radius
 		)
 
+func _process_painting():
+	if Input.is_action_pressed("add_density"):
+		if DEBUG:
+			print("[Interactor] Paint material", current_material_id,
+				  "at", last_hit_position)
+		terrain.paint_material_world(
+			last_hit_position,
+			current_material_id,
+			brush_radius
+		)
 
 func _unhandled_input(event):
+	
+	if event.is_action_pressed("tool_sculpt"):
+		current_tool = Tool.SCULPT
+		update_brush_visual()
+		if DEBUG:
+			print("[Tool] Sculpt")
+
+	elif event.is_action_pressed("tool_paint"):
+		current_tool = Tool.PAINT
+		update_brush_visual()
+		if DEBUG:
+			print("[Tool] Paint")
+			
+	if event.is_action_pressed("next_material"):
+		if current_tool == Tool.PAINT:
+			current_material_id += 1
+
+			var count := material_palette.size()
+			if count > 0:
+				current_material_id = current_material_id % count
+			else:
+				current_material_id = 0
+
+			update_brush_visual()
+
+			if DEBUG:
+				print("[Material] Current material ID:", current_material_id)
+			
 	if event.is_action_pressed("brush_radius_up"):
 		brush_radius = clamp(
 			brush_radius + BRUSH_RADIUS_STEP,
@@ -106,3 +160,26 @@ func _unhandled_input(event):
 		)
 		if DEBUG:
 			print("[Interactor] Brush radius:", brush_radius)
+
+
+# Let's make this a texture lookup later
+var material_palette : Array[Color] = INFERNO_COLORS
+const INFERNO_COLORS : Array[Color] =  [
+	Color(0.000, 0.000, 0.016),  # very dark
+	Color(0.259, 0.039, 0.408),
+	Color(0.576, 0.149, 0.404),
+	Color(0.867, 0.318, 0.227),
+	Color(0.988, 0.647, 0.039),
+	Color(0.988, 1.000, 0.643),  # bright
+]
+
+
+
+func update_brush_visual():
+	var mat := selection_marker.material_override as StandardMaterial3D
+	match current_tool:
+		Tool.SCULPT:
+			mat.albedo_color = Color(0.2, 0.4, 1.0, 0.25) # blue
+		Tool.PAINT:
+			var c := material_palette[current_material_id]
+			mat.albedo_color = Color(c.r, c.g, c.b, 0.25)

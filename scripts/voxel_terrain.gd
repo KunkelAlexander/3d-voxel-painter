@@ -159,8 +159,8 @@ extends Node3D
 @onready var static_body := $StaticBody3D
 @onready var collision_shape := $StaticBody3D/CollisionShape3D
 
-const SIZE_X := 32
-const SIZE_Y := 32
+const SIZE_X := 16
+const SIZE_Y := 16
 const SIZE_Z := 16
 const ISO_LEVEL := 0.0
 const AIR := 1  # or any positive value = outside
@@ -170,6 +170,31 @@ const DEBUG_MESH := false
 const BRUSH_RADIUS := 2
 
 var density_field := {} # Dictionary<Vector3i, float>
+
+# We store materials on grid points and interpolate to vertex colours in the first step
+# Alternatively one could colour the generated verticles which would be more precise 
+# This could be a layer on top (i.e. material with a paint on top) 
+var material_id_field := {} # Dictionary<Vector3i, int>
+
+# Let's make this a texture lookup later
+var material_palette := {
+	0: INFERNO_COLORS[0],
+	1: INFERNO_COLORS[1],
+	2: INFERNO_COLORS[2],
+	3: INFERNO_COLORS[3],
+	4: INFERNO_COLORS[4],
+	5: INFERNO_COLORS[5],
+}
+
+const INFERNO_COLORS := [
+	Color(0.000, 0.000, 0.016),  # very dark
+	Color(0.259, 0.039, 0.408),
+	Color(0.576, 0.149, 0.404),
+	Color(0.867, 0.318, 0.227),
+	Color(0.988, 0.647, 0.039),
+	Color(0.988, 1.000, 0.643),  # bright
+]
+
 
 	
 func dbg(x, y, z) -> bool:
@@ -231,8 +256,36 @@ func add_density_world(world_pos: Vector3, strength: float, radius: float):
 					density_field[p] = new_val
 
 	generate_mesh()
-	
 
+func paint_material_world(world_pos: Vector3, material_id: int, radius: float):
+	var center := Vector3i(
+		floor(world_pos.x),
+		floor(world_pos.y),
+		floor(world_pos.z)
+	)
+
+	var r := int(ceil(radius))
+	var r_f := float(radius)
+
+	for x in range(center.x - r, center.x + r + 1):
+		for y in range(center.y - r, center.y + r + 1):
+			for z in range(center.z - r, center.z + r + 1):
+				var p := Vector3i(x, y, z)
+
+				if Vector3(p).distance_to(world_pos) > r_f:
+					continue
+
+				# Only paint where density exists
+				if density_field.has(p):
+					material_id_field[p] = material_id
+
+	print("Generating colour mesh")
+	generate_mesh()
+
+
+
+
+	
 # Sample cube corners
 # The numbers 0-7 can be written as a 3 -bit number like 000, 001, 010 and so on
 # Each bit tells you whether that corner is offset by +1 along an axis
@@ -627,6 +680,7 @@ func _ready():
 func generate_mesh():
 	var vertices: PackedVector3Array = []
 	var indices: PackedInt32Array = []
+	var colors: PackedColorArray = []
 
 	var index := 0
 
@@ -634,7 +688,7 @@ func generate_mesh():
 		for y in range(SIZE_Y - 1):
 			for z in range(SIZE_Z - 1):
 				var before := vertices.size()
-				march_cube(x, y, z, vertices, indices, index)
+				march_cube(x, y, z, vertices, colors)
 				var after := vertices.size()
 				if DEBUG_MESH:
 					print("cube (", x, y, z, ") emitted ", (after - before) / 3, " triangles")
@@ -650,6 +704,7 @@ func generate_mesh():
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_COLOR]  = colors
 	#arrays[Mesh.ARRAY_INDEX] = indices
 
 	var mesh := ArrayMesh.new()
@@ -662,9 +717,16 @@ func generate_mesh():
 		return
 
 	collision_shape.shape = mesh.create_trimesh_shape()
+	
+	# Enable vertex colours
+	if mesh_instance.material_override == null:
+		var mat := StandardMaterial3D.new()
+		mat.vertex_color_use_as_albedo = true
+		mesh_instance.material_override = mat
+ 
 
 
-func march_cube(x, y, z, vertices, indices, index):
+func march_cube(x, y, z, vertices, colors):
 	var cube = []
 	
 
@@ -706,7 +768,9 @@ func march_cube(x, y, z, vertices, indices, index):
 		)
 
 	var vert_list = []
+	var color_list = []
 	vert_list.resize(12)
+	color_list.resize(12)
 
 	# Interpolate edges that are crossed
 	# At this stage, the algorithm only knows that the cube surface crosses a given edge somewhere
@@ -716,15 +780,16 @@ func march_cube(x, y, z, vertices, indices, index):
 	# How to connect neighboring cubes consistently
 	for edge in range(12):
 		if edges & (1 << edge):
-			var v = interpolate_edge(Vector3(x, y, z), edge)
-			vert_list[edge] = v
+			var res = interpolate_edge_with_color(Vector3(x, y, z), edge)
+			vert_list[edge] = res.pos
+			color_list[edge] = res.color
 
 			if dbg(x,y,z):
-				if is_nan(v.x) or is_nan(v.y) or is_nan(v.z):
+				if is_nan(res.pos.x) or is_nan(res.pos.y) or is_nan(res.pos.z):
 					print("!!! NaN vertex on edge ", edge)
 				else:
 					print("edge ", edge,
-						" vertex=", v
+						" vertex=", res.pos
 					)
 	# Iterate over vertices
 	var i := 0
@@ -754,9 +819,20 @@ func march_cube(x, y, z, vertices, indices, index):
 		vertices.append(a)
 		vertices.append(c)
 		vertices.append(b)
+		
+				
+		colors.append(color_list[i0])
+		colors.append(color_list[i2])
+		colors.append(color_list[i1])
 
 		i += 3
 
+
+func material_id_to_color(id: int) -> Color:
+	return material_palette.get(id, INFERNO_COLORS[0])
+
+func sample_material_color(p: Vector3i) -> Color:
+	return material_id_to_color(material_id_field.get(p, 0))
 		
 # Minimal version: Constant interpolation
 # Assume that vertex of surface lies at midpoint between corners
@@ -780,3 +856,28 @@ func interpolate_edge(base: Vector3, edge: int):
 
 	var t = (d0 - ISO_LEVEL) / (d0 - d1)
 	return p0 + t * (p1 - p0)
+
+func interpolate_edge_with_color(base: Vector3, edge: int):
+	var c0 = EDGE_TO_POINTS[edge][0]
+	var c1 = EDGE_TO_POINTS[edge][1]
+
+	var p0_i = Vector3i(base) + Vector3i(cube_corner(0,0,0,c0))
+	var p1_i = Vector3i(base) + Vector3i(cube_corner(0,0,0,c1))
+
+	var p0 = Vector3(p0_i)
+	var p1 = Vector3(p1_i)
+
+	var d0 = density(p0.x, p0.y, p0.z)
+	var d1 = density(p1.x, p1.y, p1.z)
+
+	var t = (d0 - ISO_LEVEL) / (d0 - d1)
+
+	# Interpolated position
+	var pos = p0 + t * (p1 - p0)
+
+	# Interpolated color
+	var col0 = sample_material_color(p0_i)
+	var col1 = sample_material_color(p1_i)
+	var col = col0.lerp(col1, t)
+
+	return { "pos": pos, "color": col }

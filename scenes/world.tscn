@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bdi6kro28lghl" path="res://scripts/voxel_interactor.gd" id="4_i7141"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f3sb7"]
+sky_top_color = Color(0.49907, 0, 0.0521424, 1)
 
 [sub_resource type="Sky" id="Sky_fj7yv"]
 sky_material = SubResource("ProceduralSkyMaterial_f3sb7")
@@ -15,7 +16,7 @@ background_mode = 2
 sky = SubResource("Sky_fj7yv")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fj7yv"]
-albedo_color = Color(1, 0.67451, 1, 1)
+albedo_color = Color(0.222767, 0.034192, 0, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_tlwt5"]
 material = SubResource("StandardMaterial3D_fj7yv")
