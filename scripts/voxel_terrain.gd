@@ -163,7 +163,7 @@ const SIZE_X := 16
 const SIZE_Y := 16
 const SIZE_Z := 16
 const ISO_LEVEL := 0.0
-const AIR := 1e6  # or any positive value = outside
+const AIR := 1  # or any positive value = outside
 const SOLID := -1.0
 const DEBUG := false
 const DEBUG_MESH := false
@@ -198,6 +198,20 @@ func is_ground(p: Vector3i) -> bool:
 func is_within_bounding_box(p: Vector3i) -> bool:
 	return (p.x >= 0 && p.x < SIZE_X) && (p.y >= 0 && p.y < SIZE_Y) && (p.z >= 0 && p.z < SIZE_Z)
 	
+func add_density(p: Vector3i, delta: float):
+	var old = density_field.get(p, AIR)
+	var new_val = old + delta
+
+	if new_val > 0.0:
+		density_field.erase(p)
+	else:
+		density_field[p] = new_val
+
+	print("Went from ", old, " to ", new_val, " at ", p)
+	generate_mesh()
+
+
+
 # Sample cube corners
 # The numbers 0-7 can be written as a 3 -bit number like 000, 001, 010 and so on
 # Each bit tells you whether that corner is offset by +1 along an axis

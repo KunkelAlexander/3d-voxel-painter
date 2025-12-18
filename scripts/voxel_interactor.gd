@@ -1,6 +1,6 @@
 extends Node3D
 
-const DEBUG := true
+const DEBUG := false
 
 @export var camera_path: NodePath
 @export var terrain_path: NodePath
@@ -8,7 +8,7 @@ const DEBUG := true
 var selection_marker: MeshInstance3D
 var camera: Camera3D
 var terrain
-
+var current_selection: Vector3i
 
 func _ready():
 	camera = get_node(camera_path)
@@ -125,3 +125,15 @@ func _process(_dt):
 
 	selection_marker.visible = true
 	selection_marker.global_position = Vector3(p)
+	current_selection = p
+
+
+	if Input.is_action_pressed("add_density"):
+		if DEBUG:
+			print("[Interactor] Add density at", p)
+		terrain.add_density(p, -1.0)
+
+	if Input.is_action_pressed("remove_density"):
+		if DEBUG:
+			print("[Interactor] Remove density at", p)
+		terrain.add_density(p, +1.0)
