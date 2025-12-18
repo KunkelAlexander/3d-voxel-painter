@@ -9,6 +9,10 @@ var selection_marker: MeshInstance3D
 var camera: Camera3D
 var terrain
 var current_selection: Vector3i
+var brush_radius := 2.0
+const MIN_BRUSH_RADIUS := 0.5
+const MAX_BRUSH_RADIUS := 4.0
+const BRUSH_RADIUS_STEP := 0.1
 
 func _ready():
 	camera = get_node(camera_path)
@@ -21,10 +25,10 @@ func _ready():
 
 	selection_marker = MeshInstance3D.new()
 	selection_marker.mesh = SphereMesh.new()
-	selection_marker.scale = Vector3.ONE * 0.2
+	selection_marker.scale = Vector3.ONE * 1.6
 
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.2, 0.4, 1.0, 0.6)
+	mat.albedo_color = Color(0.2, 0.4, 1.0, 0.3)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 
@@ -131,9 +135,29 @@ func _process(_dt):
 	if Input.is_action_pressed("add_density"):
 		if DEBUG:
 			print("[Interactor] Add density at", p)
-		terrain.add_density(p, -1.0)
+		terrain.add_density(p, -0.1, brush_radius)
 
 	if Input.is_action_pressed("remove_density"):
 		if DEBUG:
 			print("[Interactor] Remove density at", p)
-		terrain.add_density(p, +1.0)
+		terrain.add_density(p, +0.1, brush_radius)
+
+
+func _unhandled_input(event):
+	if event.is_action_pressed("brush_radius_up"):
+		brush_radius = clamp(
+			brush_radius + BRUSH_RADIUS_STEP,
+			MIN_BRUSH_RADIUS,
+			MAX_BRUSH_RADIUS
+		)
+		if DEBUG:
+			print("[Interactor] Brush radius:", brush_radius)
+
+	elif event.is_action_pressed("brush_radius_down"):
+		brush_radius = clamp(
+			brush_radius - BRUSH_RADIUS_STEP,
+			MIN_BRUSH_RADIUS,
+			MAX_BRUSH_RADIUS
+		)
+		if DEBUG:
+			print("[Interactor] Brush radius:", brush_radius)
