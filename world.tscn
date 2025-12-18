@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://dt1wmc4rob5kn"]
+[gd_scene load_steps=8 format=3 uid="uid://dt1wmc4rob5kn"]
 
 [ext_resource type="Script" uid="uid://dwtmro20xp3vn" path="res://player.gd" id="1_f3sb7"]
+[ext_resource type="Script" uid="uid://cy4iyllw61jrh" path="res://voxel_terrain.gd" id="2_fj7yv"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fj7yv"]
 
@@ -25,12 +26,18 @@ script = ExtResource("1_f3sb7")
 [node name="Camera3D" type="Camera3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_tlwt5")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.027231, 0.870443, 0.491516, -0.826302, -0.257116, 0.501115, 0.562568, -0.419787, 0.712247, -3.86903, 15.1266, -7.30279)
 shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="Sky" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_tlwt5")
+
+[node name="VoxelTerrain" type="Node3D" parent="."]
+script = ExtResource("2_fj7yv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="VoxelTerrain"]
+skeleton = NodePath("../..")
