@@ -163,6 +163,10 @@ const SIZE_Y := 16
 const SIZE_Z := 16
 const ISO_LEVEL := 0.0
 
+
+func is_ground(p: Vector3i) -> bool:
+	return p.y == 0
+	
 # 1. DENSITY FIELD
 func density(x: float, y: float, z: float) -> float:
 	var center = Vector3(8.0, 8.0, 8.0)
