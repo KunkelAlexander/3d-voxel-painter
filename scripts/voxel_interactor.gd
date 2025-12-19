@@ -4,6 +4,7 @@ const DEBUG := false
 
 @export var camera_path: NodePath
 @export var terrain_path: NodePath
+@export var color_picker: ColorPicker
 
 var selection_marker: MeshInstance3D
 var camera: Camera3D
@@ -156,20 +157,7 @@ func _unhandled_input(event):
 		update_brush_visual()
 		if DEBUG:
 			print("[Tool] Paint")
-			
-	if event.is_action_pressed("next_material"):
-		current_material_id += 1
-
-		var count := material_palette.size()
-		if count > 0:
-			current_material_id = current_material_id % count
-		else:
-			current_material_id = 0
-
-		update_brush_visual()
-
-		if DEBUG:
-			print("[Material] Current material ID:", current_material_id)
+		
 			
 	if event.is_action_pressed("brush_radius_up"):
 		brush_radius = clamp(
@@ -198,23 +186,22 @@ func _unhandled_input(event):
 		var cmd = redo_stack.pop_back()
 		cmd.execute(terrain)
 		undo_stack.append(cmd)
+		
+func _input(event):
+	if event.is_action_pressed("open_material_picker"):
+		match Game.mode:
+			Game.Mode.GAMEPLAY:
+				Game.set_mode(Game.Mode.MATERIAL_PICKER)
+			Game.Mode.MATERIAL_PICKER:
+				Game.set_mode(Game.Mode.GAMEPLAY)
 
-# Let's make this a texture lookup later
-var material_palette : Array[Color] = INFERNO_COLORS
-const INFERNO_COLORS : Array[Color] =  [
-	Color(0.000, 0.000, 0.016),  # very dark
-	Color(0.259, 0.039, 0.408),
-	Color(0.576, 0.149, 0.404),
-	Color(0.867, 0.318, 0.227),
-	Color(0.988, 0.647, 0.039),
-	Color(0.988, 1.000, 0.643),  # bright
-]
-
-
+func _on_color_picker_color_changed(color: Color) -> void:
+	current_material_id = MaterialPalette.create_color(color)
+	update_brush_visual()
 
 func update_brush_visual():
 	var mat := selection_marker.material_override as StandardMaterial3D
-	var c := material_palette[current_material_id]
+	var c := MaterialPalette.get_color(current_material_id)
 	mat.albedo_color = Color(c.r, c.g, c.b, 0.25)
 
 

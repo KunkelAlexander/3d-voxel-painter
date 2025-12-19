@@ -61,7 +61,7 @@ func set_density(p: Vector3i, d: float):
 
 	var chunk = get_or_create_chunk(c)
 	chunk.set_density(l, d)
-	chunk.mark_dirty()
+	mark_chunk_dirty(c)
 	
 	
 	# Propagate dirtiness to neighbors if on boundary
@@ -76,7 +76,7 @@ func set_material(p: Vector3i, m: int):
 
 	var chunk = get_or_create_chunk(c)
 	chunk.set_material(l, m)
-	chunk.mark_dirty()
+	mark_chunk_dirty(c)
 	
 	
 	# Propagate dirtiness to neighbors if on boundary

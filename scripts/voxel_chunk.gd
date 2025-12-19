@@ -175,30 +175,12 @@ const DEBUG_MESH       := false
 const BRUSH_RADIUS     := 2
 const DEFAULT_MATERIAL := 0
 const NO_MATERIAL      := -1
+
 # We store materials on grid points and interpolate to vertex colours in the first step
 # Alternatively one could colour the generated verticles which would be more precise
 # This could be a layer on top (i.e. material with a paint on top)
 var density_field      := {} # Dictionary<Vector3i, float>
 var material_id_field  := {} # Dictionary<Vector3i, int>
-
-# Let's make this a texture lookup later
-var material_palette := {
-	0: INFERNO_COLORS[0],
-	1: INFERNO_COLORS[1],
-	2: INFERNO_COLORS[2],
-	3: INFERNO_COLORS[3],
-	4: INFERNO_COLORS[4],
-	5: INFERNO_COLORS[5],
-}
-
-const INFERNO_COLORS := [
-	Color(0.000, 0.000, 0.016),  # very dark
-	Color(0.259, 0.039, 0.408),
-	Color(0.576, 0.149, 0.404),
-	Color(0.867, 0.318, 0.227),
-	Color(0.988, 0.647, 0.039),
-	Color(0.988, 1.000, 0.643),  # bright
-]
 
 var dirty := false
 func mark_dirty():
@@ -648,6 +630,7 @@ var EDGE_TO_POINTS = [
 	[0,4],[1,5],[2,6],[3,7]
 ]
 
+
 func _ready():
 	
 	# Mesh
@@ -667,11 +650,15 @@ func _ready():
 	init_density()
 	#mark_dirty()
 
+
 func _process(_delta):
 	if dirty:
 		generate_mesh()
 		dirty = false
-		
+
+func _on_palette_changed():
+	mark_dirty()
+
 func generate_mesh():
 	var vertices: PackedVector3Array = []
 	var normals:  PackedVector3Array = []
@@ -824,9 +811,8 @@ func march_cube(x: int, y: int, z: int, vertices, normals, colors):
 
 		i += 3
 
-
 func material_id_to_color(id: int) -> Color:
-	return material_palette.get(id, INFERNO_COLORS[0])
+	return MaterialPalette.get_color(id)
 
 func sample_material_color(p: Vector3i):
 	var material_id = get_material_local_or_world(p)
@@ -871,7 +857,7 @@ func interpolate_edge_with_color(base: Vector3i, edge: int):
 
 	var col: Color
 	if col0 == null and col1 == null:
-		col = INFERNO_COLORS[0] # fallback, should not really happen
+		col = Color(0, 0, 0) # fallback, should not really happen
 	elif col0 == null:
 		col = col1
 	elif col1 == null:

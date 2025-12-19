@@ -111,6 +111,28 @@ Add chunks on demand - loading and unloading are not dynamic yet.
 </p>
 
 
+### 7. Save and load filepickers
+
+Also support savings of chunked data.
+
+<p align="center">
+  <a href="figures/development_snapshots/Screenshot from 2025-12-19 21-34-05.png">
+	<img src="figures/development_snapshots/Screenshot from 2025-12-19 21-34-05.png" width="800">
+  </a>
+</p>
+
+### 8. A colourwheel
+
+User can pick from a nice colour palette to colour voxels. Every colour gets assigned an id.
+Currently, the id's are written to the output chunk file - but not the palette's. Fix it!
+
+<p align="center">
+  <a href="figures/development_snapshots/Screenshot from 2025-12-19 22-35-51.png">
+	<img src="figures/development_snapshots/Screenshot from 2025-12-19 22-35-51.png" width="800">
+  </a>
+</p>
+
+
 ## Current Features
 
 * Marching Cubes terrain with linear interpolation
@@ -133,7 +155,7 @@ Add chunks on demand - loading and unloading are not dynamic yet.
 | Sculpt out          | Mouse Button              |
 | Paint material      | Mouse Button (paint mode) |
 | Change brush radius | Mouse Wheel               |
-| Cycle material      | `Tab`                     |
+| Open palette        | `Tab`                     |
 | Move                | WASD + Space + Shift      |
 | Undo/redo           | Control + z/y             |
 | Menu                | Escape                    |
@@ -142,7 +164,6 @@ Add chunks on demand - loading and unloading are not dynamic yet.
 ## Planned Work
 
 * [ ] Performance optimizations
-* [ ] Tool & material UI
 * [ ] Texture-based materials
 * [ ] Additional sculpting tools
 

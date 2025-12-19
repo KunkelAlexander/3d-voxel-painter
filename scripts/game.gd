@@ -1,6 +1,10 @@
 extends Node
 
-enum Mode { GAMEPLAY, MENU }
+enum Mode {
+	GAMEPLAY,
+	MENU,
+	MATERIAL_PICKER
+}
 var mode := Mode.GAMEPLAY
 
 signal mode_changed(new_mode)
@@ -20,10 +24,16 @@ func set_mode(new_mode: Mode):
 	
 func _unhandled_input(event):
 	if event.is_action_pressed("exit"):
-		if mode == Mode.GAMEPLAY:
-			set_mode(Mode.MENU)
-		else:
-			set_mode(Mode.GAMEPLAY)
+		match mode:
+			Mode.GAMEPLAY:
+				set_mode(Mode.MENU)
+
+			Mode.MATERIAL_PICKER:
+				set_mode(Mode.GAMEPLAY)
+
+			Mode.MENU:
+				set_mode(Mode.GAMEPLAY)
+			
 			
 func _apply_mouse_mode():
 	match mode:
@@ -31,7 +41,9 @@ func _apply_mouse_mode():
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		Mode.MENU:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-			
+		Mode.MATERIAL_PICKER:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		
 
 func get_world() -> Node:
 	return get_tree().get_first_node_in_group("world")
