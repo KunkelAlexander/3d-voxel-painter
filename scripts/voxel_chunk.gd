@@ -225,7 +225,6 @@ func get_density_local_or_world(p: Vector3i) -> float:
 	if owns_sample(p):
 		return get_density(p)
 
-	print("Getting world sample for ", p)
 	# Convert to world position
 	var world_p := chunk_coord * SIZE + p
 	return world.get_density(world_p)
@@ -258,26 +257,6 @@ func set_material(p: Vector3i, value):
 func init_density():
 	if true:
 		return
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 12345  # deterministic across runs
-
-	for x in range(SIZE):
-		for y in range(SIZE):
-			for z in range(SIZE):
-				var p := Vector3i(x, y, z)
-
-				# Random density around ISO_LEVEL
-				var d := rng.randf_range(-1.0, 1.0)
-
-				if d <= 0.0:
-					density_field[p] = d
-					material_id_field[p] = rng.randi_range(0, material_palette.size() - 1)
-
-func has_density(p: Vector3i) -> bool:
-	return density_field.has(p)
-
-func is_ground(p: Vector3i) -> bool:
-	return p.y == 0
 
 func owns_sample(p: Vector3i) -> bool:
 	return (p.x >= 0 && p.x < SIZE_X) && (p.y >= 0 && p.y < SIZE_Y) && (p.z >= 0 && p.z < SIZE_Z)
@@ -702,9 +681,9 @@ func generate_mesh():
 		print("Number of density points: ", density_field.size())
 		print("Number of material points: ", material_id_field.size())
 
-	for x in range(SIZE_X - 1):
-		for y in range(SIZE_Y - 1):
-			for z in range(SIZE_Z - 1):
+	for x in range(SIZE_X):
+		for y in range(SIZE_Y):
+			for z in range(SIZE_Z):
 				var before := vertices.size()
 				march_cube(x, y, z, vertices, normals, colors)
 				var after := vertices.size()

@@ -149,7 +149,6 @@ func get_material(p: Vector3i) -> int:
 	return chunk.get_material(l)
 	
 
-
 func add_density_world(world_pos: Vector3, strength: float, radius: float, material_id: int = DEFAULT_MATERIAL, command: VoxelBrushCommand = null):
 	var center := Vector3i(
 		floor(world_pos.x),
