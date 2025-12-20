@@ -1,13 +1,15 @@
-[gd_scene load_steps=13 format=3 uid="uid://dt1wmc4rob5kn"]
+[gd_scene load_steps=14 format=3 uid="uid://dt1wmc4rob5kn"]
 
 [ext_resource type="Script" uid="uid://dwtmro20xp3vn" path="res://scripts/player.gd" id="1_k0juu"]
 [ext_resource type="Script" uid="uid://cy4iyllw61jrh" path="res://scripts/voxel_chunk.gd" id="2_71j4m"]
 [ext_resource type="Script" uid="uid://bdi6kro28lghl" path="res://scripts/voxel_interactor.gd" id="4_i7141"]
+[ext_resource type="Shader" uid="uid://d3sqgfa6rw3lb" path="res://scenes/ground.gdshader" id="5_i7141"]
 [ext_resource type="Script" uid="uid://bm14rwqxjkt1r" path="res://scripts/world.gd" id="5_qfnet"]
 [ext_resource type="Script" uid="uid://brm5o0epfmyjy" path="res://scripts/ui.gd" id="6_qfnet"]
 [ext_resource type="Script" uid="uid://ctku6nm8mvx4j" path="res://scripts/pause_menu.gd" id="7_4mrxx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_71j4m"]
+ground_bottom_color = Color(1, 1, 1, 1)
 
 [sub_resource type="Sky" id="Sky_qfnet"]
 sky_material = SubResource("ProceduralSkyMaterial_71j4m")
@@ -16,12 +18,20 @@ sky_material = SubResource("ProceduralSkyMaterial_71j4m")
 background_mode = 2
 sky = SubResource("Sky_qfnet")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fj7yv"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4mrxx"]
+render_priority = 0
+shader = ExtResource("5_i7141")
+shader_parameter/chunk_size = 16.0
+shader_parameter/cell_size = 1.0
+shader_parameter/chunk_line_width = 0.12
+shader_parameter/cell_line_width = 0.03
+shader_parameter/chunk_color = Color(1, 0, 0, 1)
+shader_parameter/cell_color = Color(0, 0.8, 1, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_tlwt5"]
-material = SubResource("StandardMaterial3D_fj7yv")
+material = SubResource("ShaderMaterial_4mrxx")
 size = Vector2(100, 100)
-center_offset = Vector3(8, 0, 8)
+center_offset = Vector3(8, 2, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_aqk2v"]
 size = Vector3(100, 2, 100)

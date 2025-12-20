@@ -2,17 +2,20 @@ extends Node3D
 
 const DEFAULT_MATERIAL := 0
 var chunks := {}  # Dictionary<Vector3i, VoxelChunk>
+const DEBUG := false 
 
 func _ready():
 	add_to_group("world")
 
+# Return 3D index of chunk where p is located
 func world_to_chunk(p: Vector3i) -> Vector3i:
 	return Vector3i(
 		floor(float(p.x) / float(VoxelChunk.SIZE)),
 		floor(float(p.y) / float(VoxelChunk.SIZE)),
 		floor(float(p.z) / float(VoxelChunk.SIZE))
 	)
-
+	
+# Return local chunk coordinates from 0 to VoxelChunk.SIZE - 1
 func world_to_local(p: Vector3i) -> Vector3i:
 	return Vector3i(
 		posmod(p.x, VoxelChunk.SIZE),
@@ -23,8 +26,8 @@ func world_to_local(p: Vector3i) -> Vector3i:
 func get_or_create_chunk(chunk_coord: Vector3i) -> VoxelChunk:
 	if chunks.has(chunk_coord):
 		return chunks[chunk_coord]
-	
-
+	if DEBUG:
+		print("Create new chunk c = ", chunk_coord)
 	var chunk := VoxelChunk.new()
 	chunk.world       = self
 	chunk.chunk_coord = chunk_coord
@@ -38,8 +41,12 @@ func mark_chunk_dirty(chunk_coord: Vector3i):
 	if chunks.has(chunk_coord):
 		chunks[chunk_coord].mark_dirty()
 
-func get_boundary_neighbor_offsets(l: Vector3i) -> Array[Vector3i]:
+# Check 26 direct neighbours of p to detect whether it borders
+func get_boundary_neighbor_offsets(p: Vector3i) -> Array[Vector3i]:
 	var offsets: Array[Vector3i] = []
+
+	var base_chunk := world_to_chunk(p)
+	var seen := {}
 
 	for dx in [-1, 0, 1]:
 		for dy in [-1, 0, 1]:
@@ -47,14 +54,17 @@ func get_boundary_neighbor_offsets(l: Vector3i) -> Array[Vector3i]:
 				if dx == 0 and dy == 0 and dz == 0:
 					continue
 
-				# Check if this neighbor samples this voxel
-				if (dx == -1 and l.x == 0) or (dx == 1 and l.x == VoxelChunk.SIZE - 1) or dx == 0:
-					if (dy == -1 and l.y == 0) or (dy == 1 and l.y == VoxelChunk.SIZE - 1) or dy == 0:
-						if (dz == -1 and l.z == 0) or (dz == 1 and l.z == VoxelChunk.SIZE - 1) or dz == 0:
-							offsets.append(Vector3i(dx, dy, dz))
+				var neighbor_world := p + Vector3i(dx, dy, dz)
+				var neighbor_chunk := world_to_chunk(neighbor_world)
+
+				if neighbor_chunk != base_chunk:
+					var offset := neighbor_chunk - base_chunk
+					if not seen.has(offset):
+						seen[offset] = true
+						offsets.append(offset)
 
 	return offsets
-
+	
 func set_density(p: Vector3i, d: float):
 	var c = world_to_chunk(p)
 	var l = world_to_local(p)
@@ -62,17 +72,25 @@ func set_density(p: Vector3i, d: float):
 	var chunk = get_or_create_chunk(c)
 	chunk.set_density(l, d)
 	mark_chunk_dirty(c)
-	
+	if DEBUG:
+		print("Chunk: ", c, " Global point: ", p, " Local Point: ", l)
 	
 	# Propagate dirtiness to neighbors if on boundary
-	var neighbor_offsets := get_boundary_neighbor_offsets(l)
+	var neighbor_offsets := get_boundary_neighbor_offsets(p)
+	
+	if DEBUG:
+		print("Neighbours to be updated: ", neighbor_offsets)
 	for offset in neighbor_offsets:
-		mark_chunk_dirty(c + offset)
+		var neighbor_chunk = get_or_create_chunk(c + offset)
+		neighbor_chunk.mark_dirty()
 
 
 func set_material(p: Vector3i, m: int):
 	var c = world_to_chunk(p)
 	var l = world_to_local(p)
+	
+	if DEBUG:
+		print("Adding material at p = ", p, " in chunk c = ", c, " with local coords l = ", l)
 
 	var chunk = get_or_create_chunk(c)
 	chunk.set_material(l, m)
@@ -80,9 +98,10 @@ func set_material(p: Vector3i, m: int):
 	
 	
 	# Propagate dirtiness to neighbors if on boundary
-	var neighbor_offsets := get_boundary_neighbor_offsets(l)
+	var neighbor_offsets := get_boundary_neighbor_offsets(p)
 	for offset in neighbor_offsets:
-		mark_chunk_dirty(c + offset)
+		var neighbor_chunk = get_or_create_chunk(c + offset)
+		neighbor_chunk.mark_dirty()
 
 func get_density(p: Vector3i) -> float:
 	var c = world_to_chunk(p)

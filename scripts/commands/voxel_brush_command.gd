@@ -16,11 +16,9 @@ func execute(terrain):
 		var s = after[p]
 		terrain.set_density(p, s.density)
 		terrain.set_material(p, s.material)
-	terrain.generate_mesh()
 
 func undo(terrain):
 	for p in before.keys():
 		var s = before[p]
 		terrain.set_density(p, s.density)
 		terrain.set_material(p, s.material)
-	terrain.generate_mesh()

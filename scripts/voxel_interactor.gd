@@ -20,7 +20,7 @@ var current_tool := Tool.SCULPT
 var current_material_id := 0
 
 var brush_radius := 2.0
-const MIN_BRUSH_RADIUS := 1.0
+const MIN_BRUSH_RADIUS := 0.1
 const MAX_BRUSH_RADIUS := 4.0
 const BRUSH_RADIUS_STEP := 0.1
 const BRUSH_STRENGTH := 10
@@ -67,7 +67,13 @@ func _process(_dt):
 		return
 
 	# Store surface info
-	last_hit_position = hit.position
+	# Sticky hit positions
+	last_hit_position =  Vector3i(
+		floor(hit.position.x),
+		floor(hit.position.y),
+		floor(hit.position.z)
+		)
+		
 	last_hit_normal   = hit.normal
 
 	# Position brush slightly above surface
