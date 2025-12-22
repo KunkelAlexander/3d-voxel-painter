@@ -5,13 +5,17 @@ enum Mode {
 	MENU,
 	MATERIAL_PICKER
 }
-var mode := Mode.GAMEPLAY
+var mode := Mode.MENU
 
 signal mode_changed(new_mode)
 signal world_loaded(world)
 signal world_reset(world)
 
 var pause_menu: CanvasLayer
+
+# This is require for the web export as the browser only allows capturing the mouse after the first interaction
+var mouse_captured := false
+
 func _ready():
 	_apply_mouse_mode()
 
@@ -22,7 +26,7 @@ func set_mode(new_mode: Mode):
 	_apply_mouse_mode()
 	emit_signal("mode_changed", mode)
 	
-	
+
 func _unhandled_input(event):
 	if event.is_action_pressed("exit"):
 		match mode:

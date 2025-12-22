@@ -102,7 +102,7 @@ grow_vertical = 2
 [node name="Resume" type="Button" parent="Menu/Panel/Buttons"]
 custom_minimum_size = Vector2(320, 56)
 layout_mode = 2
-text = "Resume"
+text = "Play"
 
 [node name="Save" type="Button" parent="Menu/Panel/Buttons"]
 custom_minimum_size = Vector2(320, 56)
