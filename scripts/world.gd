@@ -33,9 +33,7 @@ func get_or_create_chunk(chunk_coord: Vector3i) -> VoxelChunk:
 	chunk.chunk_coord = chunk_coord
 	chunk.position    = Vector3(chunk_coord) * VoxelChunk.SIZE
 	chunk.dirty_requested.connect(_on_chunk_dirty_requested)
-	add_child(chunk)
-	
-	
+	add_child(chunk)	
 
 	chunks[chunk_coord] = chunk
 	return chunk
@@ -178,7 +176,7 @@ func _process(_delta):
 			continue
 
 		if chunk.dirty:
-			chunk.dirty = false  # <-- clear first
+			chunk.dirty = false
 			chunk.generate_mesh()
 
 

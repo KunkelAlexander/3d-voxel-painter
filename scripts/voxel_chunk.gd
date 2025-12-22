@@ -671,14 +671,17 @@ func generate_mesh():
 			print("v[", i, "] = ", vertices[i])
 
 		
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = vertices
-	arrays[Mesh.ARRAY_NORMAL] = normals
-	arrays[Mesh.ARRAY_COLOR]  = colors
 
 	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	
+	# Skip mesh generation if there are no vertices but make sure to set empty mesh
+	if vertices.size():
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = vertices
+		arrays[Mesh.ARRAY_NORMAL] = normals
+		arrays[Mesh.ARRAY_COLOR]  = colors
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh_instance.mesh = mesh
 
 	# Update collision

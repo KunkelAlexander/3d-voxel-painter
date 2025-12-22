@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dwtmro20xp3vn" path="res://scripts/player.gd" id="1_k0juu"]
 [ext_resource type="Script" uid="uid://cy4iyllw61jrh" path="res://scripts/voxel_chunk.gd" id="2_71j4m"]
 [ext_resource type="Script" uid="uid://bdi6kro28lghl" path="res://scripts/voxel_interactor.gd" id="4_i7141"]
-[ext_resource type="Shader" uid="uid://d3sqgfa6rw3lb" path="res://scenes/ground.gdshader" id="5_i7141"]
+[ext_resource type="Shader" uid="uid://d3sqgfa6rw3lb" path="res://shaders/ground.gdshader" id="5_i7141"]
 [ext_resource type="Script" uid="uid://bm14rwqxjkt1r" path="res://scripts/world.gd" id="5_qfnet"]
 [ext_resource type="Script" uid="uid://brm5o0epfmyjy" path="res://scripts/ui.gd" id="6_qfnet"]
 [ext_resource type="Script" uid="uid://ctku6nm8mvx4j" path="res://scripts/pause_menu.gd" id="7_4mrxx"]
@@ -71,7 +71,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
 mesh = SubResource("PlaneMesh_tlwt5")
 skeleton = NodePath("../..")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+[node name="CollisionShape" type="CollisionShape3D" parent="Ground"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 shape = SubResource("BoxShape3D_aqk2v")
 
