@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dt1wmc4rob5kn"]
+[gd_scene load_steps=15 format=3 uid="uid://dt1wmc4rob5kn"]
 
 [ext_resource type="Script" uid="uid://dwtmro20xp3vn" path="res://scripts/player.gd" id="1_k0juu"]
 [ext_resource type="Script" uid="uid://cy4iyllw61jrh" path="res://scripts/voxel_chunk.gd" id="2_71j4m"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bm14rwqxjkt1r" path="res://scripts/world.gd" id="5_qfnet"]
 [ext_resource type="Script" uid="uid://brm5o0epfmyjy" path="res://scripts/ui.gd" id="6_qfnet"]
 [ext_resource type="Script" uid="uid://ctku6nm8mvx4j" path="res://scripts/pause_menu.gd" id="7_4mrxx"]
+[ext_resource type="Script" uid="uid://b5wd1ftiy787y" path="res://scripts/help_panel.gd" id="8_4mrxx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_71j4m"]
 ground_bottom_color = Color(1, 1, 1, 1)
@@ -136,6 +137,37 @@ offset_right = 298.0
 offset_bottom = 572.0
 focus_mode = 2
 picker_shape = 2
+
+[node name="HelpPanel" type="CanvasLayer" parent="."]
+script = ExtResource("8_4mrxx")
+
+[node name="Panel2" type="Panel" parent="HelpPanel"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_right = -300.0
+grow_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Control" type="Control" parent="HelpPanel/Panel2"]
+anchors_preset = 0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="HelpPanel/Panel2/Control"]
+layout_mode = 0
+offset_right = 250.0
+offset_bottom = 7751.0
+bbcode_enabled = true
+text = "Sculpt/pain mode: [b]1/2[/b]
+Sculpt in/out: [b]Left/right click[/b]
+Brush radius: [b]Mouse Wheel[/b]
+Open palette: [b]Tab[/b]
+Move: [b]WASD / Space / Shift[/b]
+Undo / Redo: [b]Ctrl + Z / Y[/b]
+Menu: [b]Esc[/b]
+"
+fit_content = true
+scroll_active = false
 
 [connection signal="pressed" from="Menu/Panel/Buttons/Resume" to="Menu" method="_on_resume_pressed"]
 [connection signal="pressed" from="Menu/Panel/Buttons/Save" to="Menu" method="_on_save_pressed"]
