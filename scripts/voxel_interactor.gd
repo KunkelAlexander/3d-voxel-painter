@@ -23,7 +23,12 @@ var brush_radius := 2.0
 const MIN_BRUSH_RADIUS := 0.1
 const MAX_BRUSH_RADIUS := 10.0
 const BRUSH_RADIUS_STEP := 0.1
-const BRUSH_STRENGTH := 10
+
+var brush_strength := 5
+const MIN_BRUSH_STRENGTH := 1
+const MAX_BRUSH_STRENGTH := 10.0
+const BRUSH_STRENGTH_STEP := 1
+
 var last_hit_position: Vector3
 var last_hit_normal: Vector3
 
@@ -99,7 +104,7 @@ func _process_sculpting():
 			print("[Interactor] Add density at", last_hit_position)
 		terrain.add_density_world(
 			last_hit_position,
-			-BRUSH_STRENGTH,
+			-brush_strength,
 			brush_radius,
 			current_material_id,
 			active_command
@@ -110,7 +115,7 @@ func _process_sculpting():
 			print("[Interactor] Remove density at", last_hit_position)
 		terrain.add_density_world(
 			last_hit_position,
-			+BRUSH_STRENGTH,
+			+brush_strength,
 			brush_radius,
 			terrain.DEFAULT_MATERIAL,
 			active_command
@@ -163,13 +168,37 @@ func _unhandled_input(event):
 		if DEBUG:
 			print("[Tool] Paint")
 		
+	
+	
+	if event.is_action_pressed("brush_strength_up"):
+		brush_strength = clamp(
+			brush_strength + BRUSH_STRENGTH_STEP,
+			MIN_BRUSH_RADIUS,
+			MAX_BRUSH_RADIUS
+		)
+		print("Up to ", brush_strength)
+		update_brush_visual()
+		if DEBUG:
+			print("[Interactor] Brush strength:", brush_strength)
+
+	elif event.is_action_pressed("brush_strength_down"):
+		brush_strength = clamp(
+			brush_strength - BRUSH_STRENGTH_STEP,
+			MIN_BRUSH_RADIUS,
+			MAX_BRUSH_RADIUS
+		)
+		update_brush_visual()
+		if DEBUG:
+			print("[Interactor] Brush strength:", brush_strength)
 			
-	if event.is_action_pressed("brush_radius_up"):
+			
+	elif event.is_action_pressed("brush_radius_up"):
 		brush_radius = clamp(
 			brush_radius + BRUSH_RADIUS_STEP,
 			MIN_BRUSH_RADIUS,
 			MAX_BRUSH_RADIUS
 		)
+		update_brush_visual()
 		if DEBUG:
 			print("[Interactor] Brush radius:", brush_radius)
 
@@ -179,9 +208,10 @@ func _unhandled_input(event):
 			MIN_BRUSH_RADIUS,
 			MAX_BRUSH_RADIUS
 		)
+		update_brush_visual()
 		if DEBUG:
 			print("[Interactor] Brush radius:", brush_radius)
-			
+	
 	if event.is_action_pressed("undo") and undo_stack.size() > 0:
 		var cmd = undo_stack.pop_back()
 		cmd.undo(terrain)
@@ -207,7 +237,8 @@ func _on_color_picker_color_changed(color: Color) -> void:
 func update_brush_visual():
 	var mat := selection_marker.material_override as StandardMaterial3D
 	var c := MaterialPalette.get_color(current_material_id)
-	mat.albedo_color = Color(c.r, c.g, c.b, 0.25)
+	var transparency := (brush_strength - MIN_BRUSH_STRENGTH)/(MAX_BRUSH_STRENGTH - MIN_BRUSH_STRENGTH) * 0.6 + 0.1
+	mat.albedo_color = Color(c.r, c.g, c.b, transparency)
 
 
 func get_camera_ray(max_dist := 100.0) -> Dictionary:

@@ -171,6 +171,7 @@ bbcode_enabled = true
 text = "Sculpt/pain mode: [b]1/2[/b]
 Sculpt in/out: [b]Left/right click[/b]
 Brush radius: [b]Mouse Wheel[/b]
+Brush strength: [b]Ctrl + Mouse Wheel[/b]
 Open palette: [b]Tab[/b]
 Move: [b]WASD / Space / Shift[/b]
 Undo / Redo: [b]Ctrl + Z / Y[/b]
