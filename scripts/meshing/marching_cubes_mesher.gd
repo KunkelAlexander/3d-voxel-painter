@@ -650,15 +650,6 @@ func march_cube(chunk, x: int, y: int, z: int, vertices, normals, colors):
 
 		i += 3
 
-func material_id_to_color(id: int) -> Color:
-	return MaterialPalette.get_color(id)
-
-func sample_material_color(chunk, p: Vector3i):
-	var material_id = chunk.get_material(p)
-	if material_id == chunk.NO_MATERIAL:
-		return null
-	return material_id_to_color(material_id)
-
 # Minimal version: Constant interpolation
 # Assume that vertex of surface lies at midpoint between corners
 func interpolate_edge_constant(base: Vector3i, edge: int):
@@ -691,8 +682,8 @@ func interpolate_edge_with_color(chunk, base: Vector3i, edge: int):
 	var pos = p0 + t * (p1 - p0)
 
 	# Interpolated color
-	var col0 = sample_material_color(chunk, p0_i)
-	var col1 = sample_material_color(chunk, p1_i)
+	var col0 = chunk.sample_material_color(p0_i)
+	var col1 = chunk.sample_material_color(p1_i)
 
 	var col: Color
 	if col0 == null and col1 == null:

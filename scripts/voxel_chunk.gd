@@ -42,7 +42,6 @@ var dirty := false
 
 @export var mesher: VoxelMesher
 
-
 func mark_dirty():
 	if dirty:
 		return
@@ -97,7 +96,24 @@ func owns_sample(p: Vector3i) -> bool:
 	return (p.x >= 0 && p.x < SIZE_X) && (p.y >= 0 && p.y < SIZE_Y) && (p.z >= 0 && p.z < SIZE_Z)
 
 
+func material_id_to_color(id: int) -> Color:
+	return MaterialPalette.get_color(id)
 
+func sample_material_color(p: Vector3i):
+	var material_id = get_material(p)
+	if material_id == NO_MATERIAL:
+		return null
+	return material_id_to_color(material_id)
+
+func set_mesher(new_mesher: VoxelMesher):
+	if mesher == new_mesher:
+		return
+	mesher = new_mesher
+	mark_dirty()
+
+func _init(_mesher: VoxelMesher = null):
+	mesher = _mesher
+	
 func _ready():
 	
 	if mesher == null:

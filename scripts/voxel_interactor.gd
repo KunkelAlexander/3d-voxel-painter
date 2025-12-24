@@ -223,12 +223,17 @@ func _unhandled_input(event):
 		undo_stack.append(cmd)
 		
 func _input(event):
-	if event.is_action_pressed("open_material_picker"):
+
+	if event.is_action_pressed("cycle_mesher"):
+		terrain.cycle_mesher()
+	elif event.is_action_pressed("open_material_picker"):
 		match Game.mode:
 			Game.Mode.GAMEPLAY:
 				Game.set_mode(Game.Mode.MATERIAL_PICKER)
 			Game.Mode.MATERIAL_PICKER:
 				Game.set_mode(Game.Mode.GAMEPLAY)
+
+
 
 func _on_color_picker_color_changed(color: Color) -> void:
 	current_material_id = MaterialPalette.create_color(color)

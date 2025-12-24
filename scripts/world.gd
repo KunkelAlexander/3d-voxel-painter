@@ -5,6 +5,13 @@ const DEFAULT_MATERIAL := 0
 var chunks := {}  # Dictionary<Vector3i, VoxelChunk>
 var dirty_chunks: Array[VoxelChunk] = []
 
+var meshers: Array[VoxelMesher] = [
+	MarchingCubesMesher.new(),
+	BlockMesher.new(),
+]
+
+var current_mesher_index := 0
+
 func _ready():
 	add_to_group("world")
 
@@ -29,7 +36,7 @@ func get_or_create_chunk(chunk_coord: Vector3i) -> VoxelChunk:
 		return chunks[chunk_coord]
 	if DEBUG:
 		print("Create new chunk c = ", chunk_coord)
-	var chunk := VoxelChunk.new()
+	var chunk := VoxelChunk.new(meshers[current_mesher_index])
 	chunk.chunk_coord = chunk_coord
 	chunk.position    = Vector3(chunk_coord) * VoxelChunk.SIZE
 	chunk.dirty_requested.connect(_on_chunk_dirty_requested)
@@ -162,6 +169,18 @@ func add_density_world(world_pos: Vector3, strength: float, radius: float, mater
 				# Update density and material fields
 				set_density(p, new_density)
 				set_material(p, new_material)
+
+
+func apply_current_mesher():
+	var mesher := meshers[current_mesher_index]
+	for chunk in chunks.values():
+		if is_instance_valid(chunk):
+			chunk.set_mesher(mesher)
+
+func cycle_mesher():
+	current_mesher_index = (current_mesher_index + 1) % meshers.size()
+	apply_current_mesher()
+
 
 const MAX_MESHES_PER_FRAME := 2
 
