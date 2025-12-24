@@ -592,7 +592,7 @@ func march_cube(chunk, x: int, y: int, z: int, vertices, normals, colors):
 			var res           = interpolate_edge_with_color(chunk, Vector3i(x, y, z), edge)
 			vert_list[edge]   = res.pos
 			color_list[edge]  = res.color
-			normal_list[edge] = sample_gradient(chunk, res.pos)
+			#normal_list[edge] = sample_gradient(chunk, res.pos)
 
 			if chunk.DEBUG:
 				if is_nan(res.pos.x) or is_nan(res.pos.y) or is_nan(res.pos.z):
@@ -614,9 +614,9 @@ func march_cube(chunk, x: int, y: int, z: int, vertices, normals, colors):
 		var b  = vert_list[i1]
 		var c  = vert_list[i2]
 
-		var na = normal_list[i0]
-		var nb = normal_list[i1]
-		var nc = normal_list[i2]
+		#var na = normal_list[i0]
+		#var nb = normal_list[i1]
+		#var nc = normal_list[i2]
 
 		var c1 = color_list[i0]
 		var c2 = color_list[i1]
@@ -640,9 +640,9 @@ func march_cube(chunk, x: int, y: int, z: int, vertices, normals, colors):
 		vertices.append(c)
 		vertices.append(b)
 
-		normals.append(na)
-		normals.append(nc)
-		normals.append(nb)
+		#normals.append(na)
+		#normals.append(nc)
+		#normals.append(nb)
 
 		colors.append(c1)
 		colors.append(c3)
