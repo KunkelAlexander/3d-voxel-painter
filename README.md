@@ -1,6 +1,6 @@
 # Voxellini
 
-This repository documents the development of *Voxellini*, a **voxel terrain editor** built in **Godot 4**, using **Marching Cubes** for smooth surface extraction. Use it in your browser here: https://kunkelalexander.github.io/voxellini/. 
+This repository documents the development of *Voxellini*, a **voxel terrain editor** built in **Godot 4**, using **Marching Cubes** for smooth surface extraction. Use it in your browser here: https://kunkelalexander.github.io/voxellini/.
 
 <p align="center">
   <a href="figures/development_snapshots/Screenshot from 2025-12-20 16-42-59.png">
@@ -21,8 +21,7 @@ The project explores:
 
 ### 1. First Marching Cubes Output
 
-Initial implementation of Marching Cubes using the standard Bourke tables.
-The focus at this stage was correctness and understanding the algorithm.
+Initial implementation of Marching Cubes. The focus was on understanding the algorithm which clearly was not the case here.
 
 <p align="center">
   <a href="figures/development_snapshots/Screenshot from 2025-12-18 10-41-31.png">
@@ -78,7 +77,7 @@ Matplotlib's Inferno color palette is used for visualization.
 
 ### 5. Undo/Redo + Menu
 
-Implemented undo/redo using the wonderful [https://gameprogrammingpatterns.com/command.html](command pattern) alongside a simple menu.
+Implement undo/redo using the wonderful command pattern (see https://gameprogrammingpatterns.com/command.html) alongside a simple menu.
 
 <p align="center">
   <a href="figures/development_snapshots/Screenshot from 2025-12-19 15-34-48.png">
@@ -113,7 +112,7 @@ Add chunks on demand - loading and unloading are not dynamic yet.
 
 ### 7. Save and load filepickers
 
-Also support savings of chunked data.
+Also support saving and loading chunked data.
 
 <p align="center">
   <a href="figures/development_snapshots/Screenshot from 2025-12-19 21-34-05.png">
@@ -159,6 +158,18 @@ As a next step, moving from dictionaries to arrays would probably help with perf
 	<img src="figures/development_snapshots/Screenshot from 2025-12-20 21-02-03.png" width="800">
   </a>
 </p>
+
+
+
+### 10. Different meshers
+Add the option the render a cubic mesh at runtime as well as a box explaining the game's controls.
+
+<p align="center">
+  <a href="figures/development_snapshots/Screenshot from 2025-12-24 11-29-47.png">
+	<img src="figures/development_snapshots/Screenshot from 2025-12-24 11-29-47.png" width="800">
+  </a>
+</p>
+
 
 ## Current Features
 
